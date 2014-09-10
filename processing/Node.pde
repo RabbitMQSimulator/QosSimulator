@@ -26,8 +26,16 @@ abstract class Node {
     return x;
   }
   
+  void setX(float _x) {
+	this.x = _x;
+  }
+  
   float getY() {
     return y;
+  }
+  
+  void setY(float _y) {
+	this.y = _y;
   }
   
   boolean isBelowMouse() {

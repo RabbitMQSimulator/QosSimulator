@@ -1,12 +1,22 @@
 class Queue extends Node implements IConnectable {
   int type = QUEUE;
   ArrayList messages = new ArrayList();
+  int msgs_number = 0;
+  int unacked_number = 0;
   // Edge anonBinding;
   
   Queue(String name, float x, float y) {
     super(name, colors[QUEUE], x, y);
   }
+
+  void setMsgsNumber(int n) {
+	  this.msgs_number = n;
+  }
   
+  void setUnackedNumber(int n) {
+	  this.unacked_number = n;
+  }
+
   int getType() {
     return type;
   }
@@ -72,9 +82,9 @@ class Queue extends Node implements IConnectable {
   void drawLabel() {
       fill (0);
       textAlign(LEFT, TOP);
-      text("Q: " + getLabel(), 10, 10);
-	  text("msgs: " + str(messages.size()), 10, 25);
-	  text("un-acked: " + str(messages.size()), 10, 40);
+      text("ingres: " + getLabel(), 10, 10);
+	  text("msgs: " + str(msgs_number), 10, 25);
+	  text("un-acked: " + str(unacked_number), 10, 40);
   }
   
   void mouseClicked() {

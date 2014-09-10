@@ -3,6 +3,7 @@ class Consumer extends Node implements IConnectable {
   int type = CONSUMER;
   float angle = 0;
   String name = null;
+  int queuedMessages = 0;
 
   Consumer(String label, float x, float y) {
     super(label, colors[CONSUMER], x, y);
@@ -13,11 +14,19 @@ class Consumer extends Node implements IConnectable {
   }
   
   String getLabel() {
-    return name == null ? label : name;
+    return label + " msgs: " + str(queuedMessages);
   }
 
   void updateName(String name) {
       this.name = name;
+  }
+  
+  void incrQueuedMsgs(int amount) {
+	  this.queuedMessages += amount;
+  }
+  
+  void decrQueuedMsgs(int amount) {
+	  this.queuedMessages -= amount;
   }
 
   boolean accepts(Node n) {
