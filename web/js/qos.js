@@ -128,7 +128,6 @@ Consumer.prototype.subscribe = function(queue, qos) {
 	var that = this;
     this.queue = queue;
 	withProcessing(getProcessingSketchId(), function(pjs) {
-		console.log(queue.get_view_node());
 		pjs.addConnection(that.get_view_node(), queue.get_view_node());
 	});
     queue.add_consumer(this, qos);
