@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Basic.Qos Simulator</title>
+</head>
+<body>
+  <canvas id="QosSimulator" data-processing-sources="js/QosSimulator.pde"
+	  width="600" height="410">
+    <p>Your browser does not support the canvas tag.</p>
+  </canvas>
+  <noscript>
+    <p>JavaScript is required to view the contents of this page.</p>
+  </noscript>
+  <form id="queue_form">
+    <fieldset>
+      <legend>Add Queue</legend>
+      <input id="queue_id" type="hidden" name="queue_id">
+      <input id="queue_name" name="queue_name" type="text" placeholder="queue name">
+      <button id="queue_add" type="submit" class="btn btn-primary">Add</button>
+    </fieldset>
+  </form>
+  <form id="consumer_form">
+    <fieldset>
+      <legend>Add Queue</legend>
+      <input id="consumer_id" type="hidden" name="consumer_id">
+      <input id="consumer_name" name="consumer_name" type="text" placeholder="consumer name">
+      <input id="consumer_qos" name="consumer_qos" type="range" min="0" max="1000" step="5" value="10"
+        oninput="qos_amount.value=consumer_qos.value">
+      <output name="qos_amount" for="consumer_qos">10</output>
+      <button id="consumer_add" type="submit" class="btn btn-primary">Add</button>
+    </fieldset>
+  </form>
+  <script type="text/javascript" src="js/jquery-2.1.1.js"></script>
+  <script type="text/javascript" src="js/processing.min.js"></script>
+  <script type="text/javascript" src="js/helpers.js"></script>
+  <script type="text/javascript" src="js/qos_forms.js"></script>
+  <script type="text/javascript" src="js/qos.js"></script>
+  <script type="text/javascript">
+    jQuery(document).ready(function() {
+        initSimulator("QosSimulator");
+    });
+  </script>
+</body>
+</html>
