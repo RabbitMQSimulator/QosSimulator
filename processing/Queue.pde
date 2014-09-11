@@ -4,7 +4,7 @@ class Queue extends Node implements IConnectable {
   int msgs_number = 0;
   int unacked_number = 0;
   // Edge anonBinding;
-  
+
   Queue(String name, float x, float y) {
     super(name, colors[QUEUE], x, y);
   }
@@ -12,7 +12,7 @@ class Queue extends Node implements IConnectable {
   void setMsgsNumber(int n) {
 	  this.msgs_number = n;
   }
-  
+
   void setUnackedNumber(int n) {
 	  this.unacked_number = n;
   }
@@ -20,46 +20,46 @@ class Queue extends Node implements IConnectable {
   int getType() {
     return type;
   }
-  
+
   boolean accepts(Node n) {
     return n.getType() == CONSUMER;
   }
-  
+
   boolean canStartConnection() {
     return true;
   }
-  
+
   // void setAnonBinding(Edge e) {
   //   anonBinding = e;
   // }
-  
+
   Edge getAnonBinding() {
     return anonBinding;
   }
-  
+
   void connectWith(Node n, int endpoint) {
     super.connectWith(n, endpoint);
     // maybeDeliverMessage();
-  }  
-  
+  }
+
   void trasnferArrived(Transfer transfer) {
     enqueue(transfer);
     // maybeDeliverMessage();
   }
-  
+
   void transferDelivered(Transfer transfer) {
     // incoming.add(transfer.getTo());
     // maybeDeliverMessage();
   }
-  
+
   void enqueue(Transfer transfer) {
     messages.add(transfer);
   }
-  
+
   Transfer dequeue() {
     return (Transfer) messages.remove(0);
   }
-  
+
   void maybeDeliverMessage() {
     // if (messages.size() > 0) {
     //   if (incoming.size() > 0) {
@@ -69,16 +69,16 @@ class Queue extends Node implements IConnectable {
     //   }
     // }
   }
-  
+
   void changeName(String name) {
     this.label = name;
   }
-  
+
   void draw() {
-    QueueFigure.draw(this.x, this.y, this.nodeColor, 0, nodeStroke, Q_WIDTH, Q_HEIGHT, this.messages.size());
+    QueueFigure.draw(this.x, this.y, this.nodeColor, 0, nodeStroke, Q_WIDTH, Q_HEIGHT, msgs_number);
     drawLabel();
   }
-  
+
   void drawLabel() {
       fill (0);
       textAlign(LEFT, TOP);
@@ -86,7 +86,7 @@ class Queue extends Node implements IConnectable {
 	  text("msgs: " + str(msgs_number), 10, 25);
 	  text("un-acked: " + str(unacked_number), 10, 40);
   }
-  
+
   void mouseClicked() {
     // reset_form("#queue_form");
     // jQuery("#queue_id").val(this.label);
