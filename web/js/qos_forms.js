@@ -20,23 +20,20 @@ function init_form(id, submit_callback) {
 }
 
 function handle_queue_form() {
-	try {
-	    console.log('handle_queue_form');
-	    var uuid = jQuery('#queue_id').val();
-	    var ingres = parseInt(jQuery.trim(jQuery('#queue_ingres').val()), 10);
+    var uuid = jQuery('#queue_id').val();
+    var ingres = parseInt(jQuery.trim(jQuery('#queue_ingres').val()), 10);
 
-		withProcessing(getProcessingSketchId(), function(pjs) {
-			the_queue = new Queue(ingres+"", ingres, pjs.addNodeByType(QUEUE, ingres+"", STAGE_WIDTH/2, STAGE_HEIGHT/2));
-		});
+    if (null != the_queue) {
+        the_queue.set_ingres(ingres);
+    } else {
+        withProcessing(getProcessingSketchId(), function(pjs) {
+            the_queue = new Queue(ingres, pjs.addNodeByType(QUEUE, ingres+"", STAGE_WIDTH/2, STAGE_HEIGHT/2));
+        });
+        jQuery('#queue_submit').attr('value', "Edit");
+        enable_form('#consumer_form');
+    }
 
-	    jQuery('#queue_id').val(ingres);
-		enable_form('#consumer_form');
-		disable_form('#queue_form');
-	} catch (e) {
-		console.log(e);
-
-	}
-
+    jQuery('#queue_id').val(ingres);
     return false;
 }
 

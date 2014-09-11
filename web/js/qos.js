@@ -7,16 +7,16 @@ function the_log(msg) {
     $("#the_log").text(current + "\n" + msg);
 }
 
-function Queue(name, ingres, node) {
+function Queue(ingres, node) {
+    this.view = node;
     this.msg_id = 0;
     this.consumer_id = 0;
-    this.name = name;
     this.consumers = [];
     this.messages = 0; // messages queued to this queue
     this.unacked_msgs = {}; //unacked msgs
 	this.unacked_count = 0;
+
 	this.set_ingres(ingres);
-	this.view = node;
 
 	this.delivering = false;
 }
@@ -27,6 +27,7 @@ Queue.prototype.get_view_node = function() {
 
 Queue.prototype.set_ingres = function (ingres) {
 	this.ingres = ingres;
+	this.get_view_node().setLabel(ingres+"");
 	clearInterval(this.ingres_interval);
 	var that = this;
 	this.ingres_interval = setInterval(function () {
@@ -243,7 +244,6 @@ Consumer.prototype.set_id = function (id) {
 Consumer.prototype.get_id = function () {
     return this.id;
 }
-
 
 var consumers = [];
 var the_queue = null;
