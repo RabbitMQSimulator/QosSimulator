@@ -2,36 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <style>
+    body {
+      padding-top: 30px;
+    }
+
+    .mini-layout {
+      padding: 9px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+  </style>
   <title>Basic.Qos Simulator</title>
 </head>
 <body>
-  <h1>RabbitMQ Basic Qos Simulator</h1>
-  <canvas id="QosSimulator" data-processing-sources="js/QosSimulator.pde"
-	  width="600" height="410">
-    <p>Your browser does not support the canvas tag.</p>
-  </canvas>
-  <noscript>
-    <p>JavaScript is required to view the contents of this page.</p>
-  </noscript>
-  <form id="queue_form">
-    <fieldset>
-      <legend>Queue</legend>
-      <input id="queue_id" type="hidden" name="queue_id"></input>
-      <input id="queue_ingres" name="queue_ingres" type="text" placeholder="ingres"></input>
-      <button id="queue_submit" type="submit" class="btn btn-primary">Add</button></input>
-    </fieldset>
-  </form>
-  <form id="consumer_form">
-    <fieldset>
-      <legend>Consumer</legend>
-      <input id="consumer_id" type="hidden" name="consumer_id"></input>
-      <input id="consumer_delay" name="consumer_delay" type="text" placeholder="delay"></input>
-      <input id="consumer_qos" name="consumer_qos" type="text" placeholder="qos"></input>
-      <button id="consumer_add" type="submit" class="btn btn-primary">Add</button>
-    </fieldset>
-  </form>
-  <pre id="the_log"></pre>
+  <div class="container mini-layout">
+    <h1>RabbitMQ Basic Qos Simulator</h1>
+    <div class="row">
+      <div class="span8">
+        <canvas id="QosSimulator" data-processing-sources="js/QosSimulator.pde"
+          width="600" height="410">
+          <p>Your browser does not support the canvas tag.</p>
+        </canvas>
+        <noscript>
+          <p>JavaScript is required to view the contents of this page.</p>
+        </noscript>
+      </div>
+      <div class="span3 mini-layout">
+        <form id="queue_form">
+          <fieldset>
+            <legend>Queue</legend>
+            <input id="queue_id" type="hidden" name="queue_id"></input>
+            <div>
+              <input id="queue_ingres" name="queue_ingres" type="text" placeholder="ingres"></input>
+            </div>
+            <div>
+              <button id="queue_submit" type="submit" class="btn btn-primary">Add</button></input>
+            </div>
+          </fieldset>
+        </form>
+        <form id="consumer_form">
+          <fieldset>
+            <legend>Consumer</legend>
+            <input id="consumer_id" type="hidden" name="consumer_id"></input>
+            <div>
+              <input id="consumer_delay" name="consumer_delay" type="text" placeholder="delay"></input>
+            </div>
+            <div>
+            </div>
+              <input id="consumer_qos" name="consumer_qos" type="text" placeholder="qos"></input>
+            <div>
+            </div>
+              <button id="consumer_add" type="submit" class="btn btn-primary">Add</button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </div>
   <script type="text/javascript" src="js/jquery-2.1.1.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
   <script type="text/javascript" src="js/processing.min.js"></script>
   <script type="text/javascript" src="js/helpers.js"></script>
   <script type="text/javascript" src="js/qos_forms.js"></script>
