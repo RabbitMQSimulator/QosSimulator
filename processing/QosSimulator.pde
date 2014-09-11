@@ -42,7 +42,7 @@ color[] colors = new color[20];
 String[] nodeTypes = new String[2];
 
 PFont font;
-static final int fontSize = 12;
+static final int fontSize = 14;
 
 void bindJavascript(JavaScript js) {
   javascript = js;
