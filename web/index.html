@@ -14,23 +14,22 @@
   </noscript>
   <form id="queue_form">
     <fieldset>
-      <legend>Add Queue</legend>
-      <input id="queue_id" type="hidden" name="queue_id">
-      <input id="queue_name" name="queue_name" type="text" placeholder="queue name">
-      <button id="queue_add" type="submit" class="btn btn-primary">Add</button>
+      <legend>Queue</legend>
+      <input id="queue_id" type="hidden" name="queue_id"></input>
+      <input id="queue_ingres" name="queue_ingres" type="text" placeholder="ingres"></input>
+      <button id="queue_add" type="submit" class="btn btn-primary">Add</button></input>
     </fieldset>
   </form>
   <form id="consumer_form">
     <fieldset>
-      <legend>Add Queue</legend>
-      <input id="consumer_id" type="hidden" name="consumer_id">
-      <input id="consumer_name" name="consumer_name" type="text" placeholder="consumer name">
-      <input id="consumer_qos" name="consumer_qos" type="range" min="0" max="1000" step="5" value="10"
-        oninput="qos_amount.value=consumer_qos.value">
-      <output name="qos_amount" for="consumer_qos">10</output>
+      <legend>Consumer</legend>
+      <input id="consumer_id" type="hidden" name="consumer_id"></input>
+      <input id="consumer_delay" name="consumer_delay" type="text" placeholder="delay"></input>
+      <input id="consumer_qos" name="consumer_qos" type="text" placeholder="qos"></input>
       <button id="consumer_add" type="submit" class="btn btn-primary">Add</button>
     </fieldset>
   </form>
+  <pre id="the_log"></pre>
   <script type="text/javascript" src="js/jquery-2.1.1.js"></script>
   <script type="text/javascript" src="js/processing.min.js"></script>
   <script type="text/javascript" src="js/helpers.js"></script>

@@ -23,44 +23,51 @@ function handle_queue_form() {
 	try {
 	    console.log('handle_queue_form');
 	    var uuid = jQuery('#queue_id').val();
-	    var name = jQuery.trim(jQuery('#queue_name').val());
-	    var pjs = getProcessing();
-    
-		n = pjs.addNodeByType(QUEUE, name, 50, 50);
-		console.log(n);
-	    jQuery('#queue_id').val(name);
+	    var ingres = parseInt(jQuery.trim(jQuery('#queue_ingres').val()), 10);
+
+		withProcessing(getProcessingSketchId(), function(pjs) {
+			the_queue = new Queue(ingres+"", ingres, pjs.addNodeByType(QUEUE, ingres+"", STAGE_WIDTH/2, STAGE_HEIGHT/2));
+		});
+
+	    jQuery('#queue_id').val(ingres);
+		enable_form('#consumer_form');
+		disable_form('#queue_form');
 	} catch (e) {
 		console.log(e);
-		
+
 	}
-   
+
     return false;
 }
 
 function handle_consumer_form() {
 	try {
-	    console.log('handle_consumer_form');
 	    var uuid = jQuery('#consumer_id').val();
-	    var name = jQuery.trim(jQuery('#consumer_name').val());
-	    var pjs = getProcessing();
-    
-		n = pjs.addNodeByType(CONSUMER, name, 150, 150);
-		
-		if (n) {
-			q = pjs.findNode("asdf");
-			pjs.addConnection(n, q);
-		}
-		
-	    jQuery('#consumer_id').val(name);
+	    var delay = parseInt(jQuery.trim(jQuery('#consumer_delay').val()), 10);
+		var qos = parseInt(jQuery.trim(jQuery('#consumer_qos').val()), 10);
+
+		var c_name = "qos:" + qos;
+		var c = null;
+
+		withProcessing(getProcessingSketchId(), function(pjs) {
+		    c = new Consumer(c_name, delay, pjs.addNodeByType(CONSUMER, c_name, -50, -50));
+			consumers.push(c);
+		});
+
+		arrange_consumers();
+	    c.subscribe(the_queue, qos);
+
+	    jQuery('#consumer_id').val(c_name);
 	} catch (e) {
 		console.log(e);
 		return false;
 	}
-   
+
     return false;
 }
 
 jQuery(document).ready(function() {
     init_form('#queue_form', handle_queue_form);
 	init_form('#consumer_form', handle_consumer_form);
+	disable_form('#consumer_form');
 });
