@@ -65,16 +65,11 @@ Queue.prototype.incr_unacked_msgs = function(amount) {
 
 Queue.prototype.maybe_deliver_message = function() {
     var consumer = this.consumers.shift();
-    // console.log("maybe_deliver_message");
-    // if (this.delivering) {
-    //  return;
-    // }
 
     if (consumer) {
         var qos = consumer.basic_qos;
 
         while (qos == 0 || qos > this.unacked_msgs[consumer.consumer.get_id()].length) {
-            // console.log("maybe_deliver_message", this.unacked_msgs[consumer.consumer.get_id()].length, this.messages);
             if (this.messages > 0) {
                 // this.delivering = true;
                 var msg_id = this.make_msg_id();
@@ -129,14 +124,10 @@ Queue.prototype.cancel_consumer = function (consumer_id) {
 
 Queue.prototype.ack = function(consumer_id, msg_id, multi) {
 
-    // console.log("ack called");
-
     var len = this.unacked_msgs[consumer_id].length;
     var msg_id_found = false;
     var tmp = [];
     var acked = 0;
-
-    // console.log(this.unacked_msgs[consumer_id], msg_id);
 
     for (var i = 0; i < len; i++) {
         if (this.unacked_msgs[consumer_id][i] == msg_id) {
@@ -174,15 +165,12 @@ Queue.prototype.make_consumer_id = function() {
 }
 
 function Consumer(name, delay, node) {
-    console.log("Consumer", name, delay, node);
-
     this.name = name;
     this.delay = delay;
     this.queue = {};
     this.id = "";
     this.msgs = [];
     this.working = false;
-
     this.view = node;
 }
 
