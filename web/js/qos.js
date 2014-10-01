@@ -206,15 +206,6 @@ Consumer.prototype.handle_msg = function(msg) {
 	if (!this.working) {
 		this.process_next_msg();
 	}
-
-		// 	    var that = this;
-		// // console.log("handle_msg", this.delay);
-		// window.setTimeout(function () {
-		// 	that.get_view_node().rotateConsumer();
-		// 	that.get_view_node().decrQueuedMsgs(1);
-		// 	        that.queue.ack(that.get_id(), msg, false);
-		// 	that.process_next_msg();
-		// 	    }, this.delay);
 }
 
 Consumer.prototype.process_next_msg = function() {
