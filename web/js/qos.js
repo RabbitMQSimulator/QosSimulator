@@ -9,10 +9,7 @@ function Queue(ingres, node) {
     this.messages = 0; // messages queued to this queue
     this.unacked_msgs = {}; //unacked msgs
     this.unacked_count = 0;
-
     this.set_ingres(ingres);
-
-    this.delivering = false;
 }
 
 Queue.prototype.get_view_node = function() {
@@ -65,14 +62,12 @@ Queue.prototype.maybe_deliver_message = function() {
 
         while (qos == 0 || qos > this.unacked_msgs[consumer.consumer.get_id()].length) {
             if (this.messages > 0) {
-                // this.delivering = true;
                 var msg_id = this.make_msg_id();
                 this.move_msg_to_unacked(consumer.consumer.get_id(), msg_id);
                 this.decr_msgs(1);
                 this.update_view_counters();
                 consumer.consumer.handle_msg(msg_id);
             } else {
-                // this.delivering = false;
                 break;
             }
         }
