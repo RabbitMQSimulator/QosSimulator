@@ -1,12 +1,6 @@
 var STAGE_WIDTH = 600;
 var STAGE_HEIGHT = 410;
 
-function the_log(msg) {
-    return;
-    var current = $("#the_log").text();
-    $("#the_log").text(current + "\n" + msg);
-}
-
 function Queue(ingres, node) {
     this.view = node;
     this.msg_id = 0;
