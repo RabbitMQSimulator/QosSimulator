@@ -29,7 +29,7 @@ function handle_queue_form() {
         withProcessing(getProcessingSketchId(), function(pjs) {
             the_queue = new Queue(ingres, pjs.addNodeByType(QUEUE, ingres+"", STAGE_WIDTH/2, STAGE_HEIGHT/2));
         });
-        jQuery('#queue_submit').attr('value', "Edit");
+        jQuery('#queue_submit').text("Edit");
         enable_form('#consumer_form');
     }
 
