@@ -10,7 +10,7 @@ function getProcessing() {
 function withProcessing() {
     var id = arguments[0];
     var callback = arguments[1];
-    var args = Array.prototype.slice.call(arguments, 2);        
+    var args = Array.prototype.slice.call(arguments, 2);
     var pjs = Processing.getInstanceById(id);
 
     if (typeof withPTimeouts[id] != 'undefined') {
@@ -33,7 +33,7 @@ function withProcessing() {
 
 function stopRendering(pjs) {
     console.log("stopRendering");
-    pjs.stopRendering();    
+    pjs.stopRendering();
 }
 
 function startRendering(pjs, pId) {
@@ -45,7 +45,7 @@ function initSimulator(id) {
     jQuery(window).focus(function() {
         withProcessing(id, startRendering, id);
     });
-    
+
     jQuery(window).blur(function() {
         withProcessing(id, stopRendering);
     });

@@ -10,11 +10,11 @@ class Queue extends Node implements IConnectable {
   }
 
   void setMsgsNumber(int n) {
-	  this.msgs_number = n;
+      this.msgs_number = n;
   }
 
   void setUnackedNumber(int n) {
-	  this.unacked_number = n;
+      this.unacked_number = n;
   }
 
   int getType() {
@@ -83,8 +83,8 @@ class Queue extends Node implements IConnectable {
       fill (0);
       textAlign(LEFT, TOP);
       text("ingres: " + getLabel(), 10, 10);
-	  text("msgs: " + str(msgs_number), 10, 25);
-	  text("un-acked: " + str(unacked_number), 10, 40);
+      text("msgs: " + str(msgs_number), 10, 25);
+      text("un-acked: " + str(unacked_number), 10, 40);
   }
 
   void mouseClicked() {

@@ -38,33 +38,33 @@ function handle_queue_form() {
 }
 
 function handle_consumer_form() {
-	try {
-	    var uuid = jQuery('#consumer_id').val();
-	    var delay = parseInt(jQuery.trim(jQuery('#consumer_delay').val()), 10);
-		var qos = parseInt(jQuery.trim(jQuery('#consumer_qos').val()), 10);
+    try {
+        var uuid = jQuery('#consumer_id').val();
+        var delay = parseInt(jQuery.trim(jQuery('#consumer_delay').val()), 10);
+        var qos = parseInt(jQuery.trim(jQuery('#consumer_qos').val()), 10);
 
-		var c_name = "qos:" + qos;
-		var c = null;
+        var c_name = "qos:" + qos;
+        var c = null;
 
-		withProcessing(getProcessingSketchId(), function(pjs) {
-		    c = new Consumer(c_name, delay, pjs.addNodeByType(CONSUMER, c_name, -50, -50));
-			consumers.push(c);
-		});
+        withProcessing(getProcessingSketchId(), function(pjs) {
+            c = new Consumer(c_name, delay, pjs.addNodeByType(CONSUMER, c_name, -50, -50));
+            consumers.push(c);
+        });
 
-		arrange_consumers();
-	    c.subscribe(the_queue, qos);
+        arrange_consumers();
+        c.subscribe(the_queue, qos);
 
-	    jQuery('#consumer_id').val(c_name);
-	} catch (e) {
-		console.log(e);
-		return false;
-	}
+        jQuery('#consumer_id').val(c_name);
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
 
     return false;
 }
 
 jQuery(document).ready(function() {
     init_form('#queue_form', handle_queue_form);
-	init_form('#consumer_form', handle_consumer_form);
-	disable_form('#consumer_form');
+    init_form('#consumer_form', handle_consumer_form);
+    disable_form('#consumer_form');
 });

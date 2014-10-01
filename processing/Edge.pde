@@ -10,47 +10,47 @@ class Edge {
     this.to = to;
     this.edgeColor = edgeColor;
   }
-  
+
   float middleX() {
     return (from.x + to.x)/2;
   }
-  
+
   float middleY() {
     return (from.y + to.y)/2;
   }
-  
+
   void setBindingKey(String bk) {
     bindingKeyLabel = bk == "" ? DEFAULT_BINDING_KEY : bk;
   }
-  
+
   String getBindingKey() {
     return bindingKeyLabel == DEFAULT_BINDING_KEY ? "" : bindingKeyLabel;
   }
-  
+
   void remove() {
     Exchange x = (Exchange) to;
     x.removeBinding(from, getBindingKey());
   }
-  
+
   boolean labelClicked() {
     float w = textWidth(bindingKeyLabel) / 2;
     return (mouseX >= middleX() - w && mouseX <= middleX() + w &&
             mouseY >= middleY() - 10 && mouseY <= middleY() + 10);
   }
-  
+
   void draw() {
-    
+
     stroke(this.edgeColor);
     strokeWeight(edgeStroke);
     line(from.x, from.y, to.x, to.y);
-    
+
     drawArrowHead();
   }
-  
+
   void drawArrowHead() {
     boolean atStart;
     float distance;
-    
+
     switch(from.getType()) {
       case QUEUE:
       case CONSUMER:
@@ -63,7 +63,7 @@ class Edge {
         distance = 0.9;
         break;
     }
-    
+
     if (atStart) {
       float x0 = lerp(from.x, to.x, distance);
       float y0 = lerp(from.y, to.y, distance);

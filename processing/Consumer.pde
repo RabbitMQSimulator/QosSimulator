@@ -12,7 +12,7 @@ class Consumer extends Node implements IConnectable {
   int getType() {
     return type;
   }
-  
+
   String getLabel() {
     return label + " msgs: " + str(queuedMessages);
   }
@@ -20,13 +20,13 @@ class Consumer extends Node implements IConnectable {
   void updateName(String name) {
       this.name = name;
   }
-  
+
   void incrQueuedMsgs(int amount) {
-	  this.queuedMessages += amount;
+      this.queuedMessages += amount;
   }
-  
+
   void decrQueuedMsgs(int amount) {
-	  this.queuedMessages -= amount;
+      this.queuedMessages -= amount;
   }
 
   boolean accepts(Node n) {
@@ -40,25 +40,25 @@ class Consumer extends Node implements IConnectable {
   void trasnferArrived(Transfer transfer) {
     rotateConsumer();
   }
-  
+
   void rotateConsumer() {
       this.angle += 0.2;
   }
-  
+
   void draw() {
       ConsumerFigure.draw(this.x, this.y, this.nodeColor, 0, nodeStroke, this.radii, this.sides, this.angle);
       drawLabel();
   }
-  
+
   void drawLabel() {
       fill (0);
       textAlign(CENTER, CENTER);
-	  if (y >= HEIGHT/2) {
-		  text(getLabel(), x, y+labelPadding);
-	  } else {
-		  text(getLabel(), x, y-labelPadding);
-	  }
-      
+      if (y >= HEIGHT/2) {
+          text(getLabel(), x, y+labelPadding);
+      } else {
+          text(getLabel(), x, y-labelPadding);
+      }
+
   }
 
   void mouseClicked() {

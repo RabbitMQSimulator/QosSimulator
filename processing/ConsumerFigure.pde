@@ -6,7 +6,7 @@ static class ConsumerFigure
         strokeWeight(nodeStroke);
         ConsumerFigure.gear(8, 8, 10, cx, cy, PI/32, angle);
     }
-    
+
     // based on http://www.local-guru.net/blog/2009/9/3/processing-gears
     static void gear( int tooth, int ri, int ro, float cx, float cy, float o, float angle) {
         pushMatrix();

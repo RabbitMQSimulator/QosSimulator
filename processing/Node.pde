@@ -31,7 +31,7 @@ abstract class Node {
   }
 
   void setX(float _x) {
-	this.x = _x;
+    this.x = _x;
   }
 
   float getY() {
@@ -39,7 +39,7 @@ abstract class Node {
   }
 
   void setY(float _y) {
-	this.y = _y;
+    this.y = _y;
   }
 
   boolean isBelowMouse() {
