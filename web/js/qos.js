@@ -259,23 +259,3 @@ function arrange_consumers() {
 		consumers[i].get_view_node().setY(Math.sin(slice * i) * 150 + cy);
 	}
 }
-
-// jQuery(document).ready(function() {
-// 	withProcessing(getProcessingSketchId(), function(pjs) {
-//
-// 		var c_number = Math.floor((Math.random() * 10) + 1);
-//
-// 		var q = new Queue("1000", 1000, pjs.addNodeByType(QUEUE, "1000", STAGE_WIDTH/2, STAGE_HEIGHT/2));
-//
-// 		q.enqueue(1000);
-//
-// 		for (var i = 0; i < c_number; i++) {
-// 		    var qos = Math.floor((Math.random() * 10) + 1);
-// 			var c_name = "qos:" + qos;
-// 		    var c = new Consumer(c_name, 1000, pjs.addNodeByType(CONSUMER, c_name, -50, -50));
-// 			consumers.push(c);
-// 			arrange_consumers();
-// 		    c.subscribe(q, qos);
-// 		}
-// 	});
-// });
