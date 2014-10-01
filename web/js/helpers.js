@@ -31,14 +31,30 @@ function withProcessing() {
     }
 }
 
+function pauseQueue() {
+    if (the_queue != null) {
+        the_queue.pause();
+    }
+}
+
+function playQueue() {
+    if (the_queue != null) {
+        the_queue.play();
+    }
+}
+
 function stopRendering(pjs) {
     console.log("stopRendering");
     pjs.stopRendering();
+
+    pauseQueue();
 }
 
 function startRendering(pjs, pId) {
     console.log("startRendering");
     pjs.startRendering(pId);
+
+    playQueue();
 }
 
 function initSimulator(id) {

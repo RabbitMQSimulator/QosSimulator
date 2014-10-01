@@ -10,6 +10,47 @@ function Queue(ingres, node) {
     this.unacked_msgs = {}; //unacked msgs
     this.unacked_count = 0;
     this.set_ingres(ingres);
+    this.paused = false;
+    this.credit = 0;
+}
+
+Queue.prototype.pause = function() {
+    this.stop_ingres();
+    this.paused = true;
+
+    for (var i = 0; i < this.consumers.length; i++) {
+        this.consumers[i].consumer.pause();
+    }
+}
+
+Queue.prototype.play = function() {
+    this.paused = false;
+
+    for (var i = 0; i < this.consumers.length; i++) {
+        this.consumers[i].consumer.play();
+    }
+
+    this.start_ingres();
+}
+
+Queue.prototype.grant_credit = function(c) {
+    this.credit = c;
+}
+
+Queue.prototype.start_ingres = function() {
+    var that = this;
+    this.ingres_interval = setInterval(function () {
+        that.enqueue(that.ingres);
+    }, 1000);
+}
+
+Queue.prototype.stop_ingres = function() {
+    clearInterval(this.ingres_interval);
+}
+
+Queue.prototype.restart_ingres = function() {
+    this.stop_ingres();
+    this.start_ingres();
 }
 
 Queue.prototype.get_view_node = function() {
@@ -19,11 +60,7 @@ Queue.prototype.get_view_node = function() {
 Queue.prototype.set_ingres = function (ingres) {
     this.ingres = ingres;
     this.get_view_node().setLabel(ingres+"");
-    clearInterval(this.ingres_interval);
-    var that = this;
-    this.ingres_interval = setInterval(function () {
-        that.enqueue(ingres);
-    }, 1000);
+	this.restart_ingres();
 }
 
 Queue.prototype.update_view_counters = function() {
@@ -55,9 +92,21 @@ Queue.prototype.incr_unacked_msgs = function(amount) {
 
 
 Queue.prototype.maybe_deliver_message = function() {
+    if (this.paused) {
+        if (this.credit < 1) {
+            return;
+        } else {
+            this.credit--;
+        }
+    }
+
     var consumer = this.consumers.shift();
 
     if (consumer) {
+        if (this.paused) {
+            consumer.grant_credit(1);
+        }
+
         var qos = consumer.basic_qos;
 
         while (qos == 0 || qos > this.unacked_msgs[consumer.consumer.get_id()].length) {
@@ -68,6 +117,10 @@ Queue.prototype.maybe_deliver_message = function() {
                 this.update_view_counters();
                 consumer.consumer.handle_msg(msg_id);
             } else {
+                break;
+            }
+
+            if (this.paused) {
                 break;
             }
         }
@@ -161,6 +214,20 @@ function Consumer(name, delay, node) {
     this.msgs = [];
     this.working = false;
     this.view = node;
+    this.paused = false;
+    this.credit = 0;
+}
+
+Consumer.prototype.pause = function() {
+    this.paused = true;
+}
+
+Consumer.prototype.play = function() {
+    this.paused = false;
+}
+
+Consumer.prototype.grant_credit = function(c) {
+    this.credit = c;
 }
 
 Consumer.prototype.get_view_node = function() {
@@ -179,6 +246,14 @@ Consumer.prototype.subscribe = function(queue, qos) {
 Consumer.prototype.handle_msg = function(msg) {
     this.get_view_node().incrQueuedMsgs(1);
     this.msgs.push(msg);
+
+    if (this.paused) {
+        if (this.credit < 1) {
+            return;
+        } else {
+            this.credit--;
+        }
+    }
 
     if (!this.working) {
         this.process_next_msg();
