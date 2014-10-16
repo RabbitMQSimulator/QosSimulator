@@ -3,6 +3,7 @@ class Consumer extends Node implements IConnectable {
   int type = CONSUMER;
   float angle = 0;
   String name = null;
+  String uuid = null;
   int queuedMessages = 0;
 
   Consumer(String label, float x, float y) {
@@ -15,6 +16,10 @@ class Consumer extends Node implements IConnectable {
 
   String getLabel() {
     return label + " msgs: " + str(queuedMessages);
+  }
+
+  String setUUID(id) {
+      this.uuid = id;
   }
 
   void updateName(String name) {
@@ -62,6 +67,7 @@ class Consumer extends Node implements IConnectable {
   }
 
   void mouseClicked() {
+      init_consumer_form(this.uuid);
       // reset_form("#edit_consumer_form");
       // jQuery("#edit_consumer_id").val(this.label);
       //

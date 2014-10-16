@@ -66,6 +66,7 @@ class Consumer extends Node implements IConnectable {
   int type = CONSUMER;
   float angle = 0;
   String name = null;
+  String uuid = null;
   int queuedMessages = 0;
 
   Consumer(String label, float x, float y) {
@@ -75,21 +76,25 @@ class Consumer extends Node implements IConnectable {
   int getType() {
     return type;
   }
-  
+
   String getLabel() {
     return label + " msgs: " + str(queuedMessages);
+  }
+
+  String setUUID(id) {
+      this.uuid = id;
   }
 
   void updateName(String name) {
       this.name = name;
   }
-  
+
   void incrQueuedMsgs(int amount) {
-	  this.queuedMessages += amount;
+      this.queuedMessages += amount;
   }
-  
+
   void decrQueuedMsgs(int amount) {
-	  this.queuedMessages -= amount;
+      this.queuedMessages -= amount;
   }
 
   boolean accepts(Node n) {
@@ -103,28 +108,29 @@ class Consumer extends Node implements IConnectable {
   void trasnferArrived(Transfer transfer) {
     rotateConsumer();
   }
-  
+
   void rotateConsumer() {
       this.angle += 0.2;
   }
-  
+
   void draw() {
       ConsumerFigure.draw(this.x, this.y, this.nodeColor, 0, nodeStroke, this.radii, this.sides, this.angle);
       drawLabel();
   }
-  
+
   void drawLabel() {
       fill (0);
       textAlign(CENTER, CENTER);
-	  if (y >= HEIGHT/2) {
-		  text(getLabel(), x, y+labelPadding);
-	  } else {
-		  text(getLabel(), x, y-labelPadding);
-	  }
-      
+      if (y >= HEIGHT/2) {
+          text(getLabel(), x, y+labelPadding);
+      } else {
+          text(getLabel(), x, y-labelPadding);
+      }
+
   }
 
   void mouseClicked() {
+      init_consumer_form(this.uuid);
       // reset_form("#edit_consumer_form");
       // jQuery("#edit_consumer_id").val(this.label);
       //
@@ -146,7 +152,7 @@ static class ConsumerFigure
         strokeWeight(nodeStroke);
         ConsumerFigure.gear(8, 8, 10, cx, cy, PI/32, angle);
     }
-    
+
     // based on http://www.local-guru.net/blog/2009/9/3/processing-gears
     static void gear( int tooth, int ri, int ro, float cx, float cy, float o, float angle) {
         pushMatrix();
@@ -175,47 +181,47 @@ class Edge {
     this.to = to;
     this.edgeColor = edgeColor;
   }
-  
+
   float middleX() {
     return (from.x + to.x)/2;
   }
-  
+
   float middleY() {
     return (from.y + to.y)/2;
   }
-  
+
   void setBindingKey(String bk) {
     bindingKeyLabel = bk == "" ? DEFAULT_BINDING_KEY : bk;
   }
-  
+
   String getBindingKey() {
     return bindingKeyLabel == DEFAULT_BINDING_KEY ? "" : bindingKeyLabel;
   }
-  
+
   void remove() {
     Exchange x = (Exchange) to;
     x.removeBinding(from, getBindingKey());
   }
-  
+
   boolean labelClicked() {
     float w = textWidth(bindingKeyLabel) / 2;
     return (mouseX >= middleX() - w && mouseX <= middleX() + w &&
             mouseY >= middleY() - 10 && mouseY <= middleY() + 10);
   }
-  
+
   void draw() {
-    
+
     stroke(this.edgeColor);
     strokeWeight(edgeStroke);
     line(from.x, from.y, to.x, to.y);
-    
+
     drawArrowHead();
   }
-  
+
   void drawArrowHead() {
     boolean atStart;
     float distance;
-    
+
     switch(from.getType()) {
       case QUEUE:
       case CONSUMER:
@@ -228,7 +234,7 @@ class Edge {
         distance = 0.9;
         break;
     }
-    
+
     if (atStart) {
       float x0 = lerp(from.x, to.x, distance);
       float y0 = lerp(from.y, to.y, distance);
@@ -280,7 +286,7 @@ abstract class Node {
   }
 
   void setX(float _x) {
-	this.x = _x;
+    this.x = _x;
   }
 
   float getY() {
@@ -288,7 +294,7 @@ abstract class Node {
   }
 
   void setY(float _y) {
-	this.y = _y;
+    this.y = _y;
   }
 
   boolean isBelowMouse() {
@@ -470,6 +476,7 @@ Node addNodeByType(int type, String label, float x, float y) {
         nodes = (Node[]) expand(nodes);
       }
 
+      console.log(label);
       nodeTable.put(label, n);
       nodes[nodeCount++] = n;
   }
@@ -596,11 +603,11 @@ class Queue extends Node implements IConnectable {
   }
 
   void setMsgsNumber(int n) {
-	  this.msgs_number = n;
+      this.msgs_number = n;
   }
 
   void setUnackedNumber(int n) {
-	  this.unacked_number = n;
+      this.unacked_number = n;
   }
 
   int getType() {
@@ -669,8 +676,8 @@ class Queue extends Node implements IConnectable {
       fill (0);
       textAlign(LEFT, TOP);
       text("ingres: " + getLabel(), 10, 10);
-	  text("msgs: " + str(msgs_number), 10, 25);
-	  text("un-acked: " + str(unacked_number), 10, 40);
+      text("msgs: " + str(msgs_number), 10, 25);
+      text("un-acked: " + str(unacked_number), 10, 40);
   }
 
   void mouseClicked() {
@@ -690,10 +697,10 @@ static class QueueFigure
         rectMode(CENTER);
         rect(x, y, w, h, 2);
         rectMode(CORNER);
-        
+
         QueueFigure.drawMessages(msgs, x, y, w, h);
     }
-    
+
     static void drawMessages(int msgs, float x, float y, int w, int h) {
         strokeWeight(0.5);
         stroke(0);

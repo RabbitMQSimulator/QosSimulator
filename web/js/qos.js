@@ -9,9 +9,14 @@ function Queue(ingres, node) {
     this.messages = 0; // messages queued to this queue
     this.unacked_msgs = {}; //unacked msgs
     this.unacked_count = 0;
-    this.set_ingres(ingres);
-    this.paused = false;
+    this.paused = true;
     this.credit = 0;
+    this.current_consumer = null;
+    this.set_ingres(ingres);
+}
+
+Queue.prototype.get_paused = function() {
+    return this.paused;
 }
 
 Queue.prototype.pause = function() {
@@ -35,6 +40,7 @@ Queue.prototype.play = function() {
 
 Queue.prototype.grant_credit = function(c) {
     this.credit = c;
+    this.maybe_deliver_message();
 }
 
 Queue.prototype.start_ingres = function() {
@@ -50,7 +56,9 @@ Queue.prototype.stop_ingres = function() {
 
 Queue.prototype.restart_ingres = function() {
     this.stop_ingres();
-    this.start_ingres();
+    if (!this.paused) {
+        this.start_ingres();
+    }
 }
 
 Queue.prototype.get_view_node = function() {
@@ -100,33 +108,32 @@ Queue.prototype.maybe_deliver_message = function() {
         }
     }
 
-    var consumer = this.consumers.shift();
+    if (!this.current_consumer) {
+        this.current_consumer = this.consumers.shift();
+    }
 
-    if (consumer) {
+    if (this.current_consumer) {
         if (this.paused) {
-            consumer.grant_credit(1);
+            this.current_consumer.consumer.grant_credit(1);
         }
 
-        var qos = consumer.basic_qos;
+        var qos = this.current_consumer.basic_qos();
 
-        while (qos == 0 || qos > this.unacked_msgs[consumer.consumer.get_id()].length) {
+        if (qos == 0 || qos > this.unacked_msgs[this.current_consumer.consumer.get_id()].length) {
             if (this.messages > 0) {
                 var msg_id = this.make_msg_id();
-                this.move_msg_to_unacked(consumer.consumer.get_id(), msg_id);
+                this.move_msg_to_unacked(this.current_consumer.consumer.get_id(), msg_id);
                 this.decr_msgs(1);
                 this.update_view_counters();
-                consumer.consumer.handle_msg(msg_id);
-            } else {
-                break;
-            }
-
-            if (this.paused) {
-                break;
+                this.current_consumer.consumer.handle_msg(msg_id);
             }
         }
 
-        // rotate consumer position
-        this.consumers.push(consumer);
+        if (qos != 0 && qos <= this.unacked_msgs[this.current_consumer.consumer.get_id()].length) {
+            // stop sending messages to this consumer.
+            this.consumers.push(this.current_consumer);
+            this.current_consumer = null;
+        }
     }
 }
 
@@ -136,16 +143,14 @@ Queue.prototype.move_msg_to_unacked = function (consumer_id, msg_id) {
     this.update_view_counters();
 }
 
-Queue.prototype.add_consumer = function(consumer, basic_qos) {
-    var new_id = this.make_consumer_id();
+Queue.prototype.add_consumer = function(consumer) {
     var c = {
-        id: new_id,
+        id: consumer.get_id(),
         consumer: consumer,
-        basic_qos: basic_qos
+        basic_qos: consumer.get_qos
     };
-    this.unacked_msgs[new_id] = [];
+    this.unacked_msgs[consumer.get_id()] = [];
     this.consumers.push(c);
-    consumer.set_id(new_id);
 
     this.maybe_deliver_message();
 }
@@ -206,11 +211,12 @@ Queue.prototype.make_consumer_id = function() {
     return this.consumer_id++;
 }
 
-function Consumer(name, delay, node) {
+function Consumer(name, uuid, delay, node) {
     this.name = name;
     this.delay = delay;
+    this.qos = 0;
     this.queue = {};
-    this.id = "";
+    this.id = uuid;
     this.msgs = [];
     this.working = false;
     this.view = node;
@@ -234,13 +240,42 @@ Consumer.prototype.get_view_node = function() {
     return this.view;
 }
 
+Consumer.prototype.get_qos = function() {
+    return this.qos;
+}
+
+Consumer.prototype.set_qos = function(qos) {
+    this.qos = qos;
+}
+
+Consumer.prototype.get_delay = function() {
+    return this.delay;
+}
+
+Consumer.prototype.set_delay = function(delay) {
+    this.delay = delay;
+}
+
+Consumer.prototype.get_msg_len = function() {
+    return this.msgs.length;
+}
+
+Consumer.prototype.set_id = function (id) {
+    this.id = id;
+}
+
+Consumer.prototype.get_id = function () {
+    return this.id;
+}
+
 Consumer.prototype.subscribe = function(queue, qos) {
     var that = this;
     this.queue = queue;
+    this.qos = qos;
     withProcessing(getProcessingSketchId(), function(pjs) {
         pjs.addConnection(that.get_view_node(), queue.get_view_node());
     });
-    queue.add_consumer(this, qos);
+    queue.add_consumer(this);
 }
 
 Consumer.prototype.handle_msg = function(msg) {
@@ -280,16 +315,10 @@ Consumer.prototype.process_msg = function(msg) {
     this.process_next_msg();
 }
 
-Consumer.prototype.set_id = function (id) {
-    this.id = id;
-}
-
-Consumer.prototype.get_id = function () {
-    return this.id;
-}
-
 var consumers = [];
+var consumer_map = {};
 var the_queue = null;
+var queue_paused = true;
 
 function arrange_consumers() {
     var cx = STAGE_WIDTH/2;

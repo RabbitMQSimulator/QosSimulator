@@ -111,6 +111,7 @@ Node addNodeByType(int type, String label, float x, float y) {
         nodes = (Node[]) expand(nodes);
       }
 
+      console.log(label);
       nodeTable.put(label, n);
       nodes[nodeCount++] = n;
   }

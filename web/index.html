@@ -41,7 +41,7 @@
               <input id="queue_ingres" name="queue_ingres" type="text" placeholder="ingres"></input>
             </div>
             <div>
-              <button id="queue_submit" type="submit" class="btn btn-primary">Add</button></input>
+              <button id="queue_submit" type="submit" class="btn btn-primary">Add</button>
             </div>
           </fieldset>
         </form>
@@ -53,18 +53,23 @@
               <input id="consumer_delay" name="consumer_delay" type="text" placeholder="delay"></input>
             </div>
             <div>
-            </div>
               <input id="consumer_qos" name="consumer_qos" type="text" placeholder="qos"></input>
-            <div>
             </div>
+            <div>
               <button id="consumer_add" type="submit" class="btn btn-primary">Add</button>
             </div>
           </fieldset>
         </form>
+        <div>
+          <button id="playback_play" type="button" class="btn btn-default btn-xs"><i class="icon-play"></i> Play</button>
+          <button id="playback_next" type="button" class="btn btn-default btn-xs"><i class="icon-step-forward"></i> Next</button>
+        </div>
       </div>
     </div>
   </div>
   <script type="text/javascript" src="js/jquery-2.1.1.js"></script>
+  <script type="text/javascript" src="js/jquery.base64.min.js"></script>
+  <script type="text/javascript" src="js/md5.js"></script>
   <script type="text/javascript" src="js/bootstrap.min.js"></script>
   <script type="text/javascript" src="js/processing.min.js"></script>
   <script type="text/javascript" src="js/helpers.js"></script>
