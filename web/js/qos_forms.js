@@ -1,6 +1,3 @@
-var QUEUE = 0;
-var CONSUMER = 1;
-
 function reset_form(id) {
     jQuery(id).each(function () {
         this.reset();
@@ -23,15 +20,7 @@ function handle_queue_form() {
     var uuid = jQuery('#queue_id').val();
     var ingres = parseInt(jQuery.trim(jQuery('#queue_ingres').val()), 10);
 
-    if (null != the_queue) {
-        the_queue.set_ingres(ingres);
-    } else {
-        withProcessing(getProcessingSketchId(), function(pjs) {
-            the_queue = new Queue(ingres, pjs.addNodeByType(QUEUE, ingres+"", STAGE_WIDTH/2, STAGE_HEIGHT/2));
-        });
-        jQuery('#queue_submit').text("Edit");
-        enable_form('#consumer_form');
-    }
+    the_queue.enqueue(ingres);
 
     jQuery('#queue_id').val(ingres);
     return false;
@@ -66,7 +55,7 @@ function handle_consumer_form() {
                 consumer_map[uuid] = c;
             });
         } else {
-            // we are editing // stepping the consumer.
+            // we are editing the consumer.
             // handle update of consumer qos or delay.
             c = consumer_map[uuid];
             c.set_qos(qos);
@@ -89,10 +78,26 @@ function init_consumer_form(uuid) {
         jQuery("#consumer_id").val(c.get_id());
         jQuery('#consumer_delay').val(c.get_delay());
         jQuery('#consumer_qos').val(c.get_qos());
+    }
+}
 
-        if (c.get_msg_len() > 0) {
-            jQuery('#consumer_ack').prop('disabled', false);
-        }
+/**
+ * Called from the Queue.pde object to deliver messages
+**/
+function deliver_message() {
+    the_queue.grant_credit(1);
+    the_queue.maybe_deliver_message();
+}
+
+/**
+ * Called from the Consumer.pde object to deliver messages
+**/
+function process_message(uuid) {
+    var c = consumer_map[uuid];
+
+    if (typeof c != 'undefined') {
+        c.grant_credit(1);
+        c.process_next_msg();
     }
 }
 
@@ -110,7 +115,7 @@ function playback_play() {
         icn.addClass('icon-pause');
         queue_paused = false;
         the_queue.play();
-    } else {
+    } else if (btn.text() == ' Pause') {
         btn.text(' Play');
         icn.removeClass('icon-pause');
         icn.addClass('icon-play');
@@ -119,26 +124,11 @@ function playback_play() {
     }
 }
 
-function playback_next() {
-    if (the_queue == null) {
-        return;
-    }
-
-    the_queue.grant_credit(1);
-}
-
-function consumer_ack() {
-
-}
-
 jQuery(document).ready(function() {
     init_form('#queue_form', handle_queue_form);
     init_form('#consumer_form', handle_consumer_form);
-    disable_form('#consumer_form');
 
-    jQuery('#playback_play').click(playback_play);
+    // disable_form('#consumer_form');
 
-    jQuery('#playback_next').click(playback_next);
-
-    jQuery('#consumer_ack').click(consumer_ack);
+    // jQuery('#playback_play').click(playback_play);
 });

@@ -66,18 +66,12 @@ class Consumer extends Node implements IConnectable {
 
   }
 
-  void mouseClicked() {
-      init_consumer_form(this.uuid);
-      // reset_form("#edit_consumer_form");
-      // jQuery("#edit_consumer_id").val(this.label);
-      //
-      // if (name != null) {
-      //     jQuery("#edit_consumer_name").val(name);
-      // } else {
-      //     jQuery("#edit_consumer_name").val(label);
-      // }
-      //
-      // enable_form("#edit_consumer_form");
-      // show_form("#edit_consumer_form");
+  void mouseClicked(boolean modifier) {
+      if (modifier) {
+          // process/ack message.
+          process_message(this.uuid);
+      } else {
+          // init_consumer_form(this.uuid);
+      }
   }
 }

@@ -87,11 +87,11 @@ class Queue extends Node implements IConnectable {
       text("un-acked: " + str(unacked_number), 10, 40);
   }
 
-  void mouseClicked() {
-    // reset_form("#queue_form");
-    // jQuery("#queue_id").val(this.label);
-    // jQuery("#queue_name").val(this.label);
-    // enable_form("#queue_form");
-    // show_form("#queue_form");
+  void mouseClicked(boolean modifier) {
+      if (modifier) {
+          deliver_message();
+      } else {
+          // init_queue_form();
+      }
   }
 }

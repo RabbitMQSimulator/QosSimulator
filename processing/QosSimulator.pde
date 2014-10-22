@@ -193,7 +193,7 @@ void mouseClicked() {
   Node target = nodeBelowMouse();
 
   if (target != null) {
-    target.mouseClicked();
+    target.mouseClicked(altOrShiftKeyPressed());
   }
 }
 

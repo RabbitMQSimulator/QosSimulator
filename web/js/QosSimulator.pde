@@ -129,19 +129,13 @@ class Consumer extends Node implements IConnectable {
 
   }
 
-  void mouseClicked() {
-      init_consumer_form(this.uuid);
-      // reset_form("#edit_consumer_form");
-      // jQuery("#edit_consumer_id").val(this.label);
-      //
-      // if (name != null) {
-      //     jQuery("#edit_consumer_name").val(name);
-      // } else {
-      //     jQuery("#edit_consumer_name").val(label);
-      // }
-      //
-      // enable_form("#edit_consumer_form");
-      // show_form("#edit_consumer_form");
+  void mouseClicked(boolean modifier) {
+      if (modifier) {
+          // process/ack message.
+          process_message(this.uuid);
+      } else {
+          // init_consumer_form(this.uuid);
+      }
   }
 }
 static class ConsumerFigure
@@ -558,7 +552,7 @@ void mouseClicked() {
   Node target = nodeBelowMouse();
 
   if (target != null) {
-    target.mouseClicked();
+    target.mouseClicked(altOrShiftKeyPressed());
   }
 }
 
@@ -680,12 +674,12 @@ class Queue extends Node implements IConnectable {
       text("un-acked: " + str(unacked_number), 10, 40);
   }
 
-  void mouseClicked() {
-    // reset_form("#queue_form");
-    // jQuery("#queue_id").val(this.label);
-    // jQuery("#queue_name").val(this.label);
-    // enable_form("#queue_form");
-    // show_form("#queue_form");
+  void mouseClicked(boolean modifier) {
+      if (modifier) {
+          deliver_message();
+      } else {
+          // init_queue_form();
+      }
   }
 }
 static class QueueFigure
