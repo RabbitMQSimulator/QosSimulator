@@ -68,7 +68,7 @@ abstract class Node {
     outgoing.add(n);
   }
 
-  void trasnferArrived(Transfer transfer) {
+  void transferArrived(Transfer transfer) {
   }
 
   void transferDelivered(Transfer transfer) {

@@ -92,6 +92,28 @@ function deliver_message() {
 /**
  * Called from the Consumer.pde object to deliver messages
 **/
+function consumer_handle_msg(uuid, msg_id) {
+    var c = consumer_map[uuid];
+
+    if (typeof c != 'undefined') {
+        c.handle_msg(msg_id);
+    }
+}
+
+/**
+ * Called from the Consumer.pde object to ack messages
+**/
+function consumer_ack_msg(uuid, msg_id) {
+    var c = consumer_map[uuid];
+
+    if (typeof c != 'undefined') {
+        c.ack_msg(msg_id);
+    }
+}
+
+/**
+ * Called from the Consumer.pde object to process messages
+**/
 function process_message(uuid) {
     var c = consumer_map[uuid];
 

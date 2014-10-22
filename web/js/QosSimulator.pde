@@ -105,8 +105,24 @@ class Consumer extends Node implements IConnectable {
     return outgoing.size() < 1;
   }
 
-  void trasnferArrived(Transfer transfer) {
-    rotateConsumer();
+  void transferAck(Queue q, int msg_id) {
+      stage.addTransfer(new Transfer(stage, this, q, msg_id, tAckColor));
+  }
+
+  /**
+   * A msg arrived from the queue
+   **/
+  void transferArrived(Transfer transfer) {
+      // console.log("consumer, msg arrived");
+      consumer_handle_msg(this.uuid, transfer.getData());
+  }
+
+  /**
+   * Our ack  arrived to the queue
+   **/
+  void transferDelivered(Transfer transfer) {
+      // console.log("consumer, ack delivered");
+      consumer_ack_msg(this.uuid, transfer.getData());
   }
 
   void rotateConsumer() {
@@ -317,7 +333,7 @@ abstract class Node {
     outgoing.add(n);
   }
 
-  void trasnferArrived(Transfer transfer) {
+  void transferArrived(Transfer transfer) {
   }
 
   void transferDelivered(Transfer transfer) {
@@ -358,7 +374,7 @@ static class NodeFigure
         ellipse(x, y, radii * 2, radii * 2);
     }
 }/* @pjs pauseOnBlur="true"; */
-
+Stage stage = new Stage();
 int nodeCount;
 Node[] nodes = new Node[100];
 
@@ -369,7 +385,6 @@ HashMap nodeTable = new HashMap();
 ArrayList edges = new ArrayList();
 
 // use to track interactions between objects
-Node tmpNode;
 Node from;
 Node to;
 
@@ -384,6 +399,8 @@ static final color nodeColor   = #F0C070;
 static final color selectColor = #FF3030;
 static final color fixedColor  = #FF8080;
 static final color edgeColor   = #000000;
+static final color tAckColor = #000000;
+static final color tMsgColor = #FFFFFF;
 
 static final int QUEUE = 0;
 static final int CONSUMER = 1;
@@ -469,8 +486,6 @@ Node addNodeByType(int type, String label, float x, float y) {
       if (nodeCount == nodes.length) {
         nodes = (Node[]) expand(nodes);
       }
-
-      console.log(label);
       nodeTable.put(label, n);
       nodes[nodeCount++] = n;
   }
@@ -532,9 +547,7 @@ void draw() {
     e.draw();
   }
 
-  if (tmpNode != null) {
-    tmpNode.draw();
-  }
+  stage.draw();
 }
 
 Node nodeBelowMouse() {
@@ -568,10 +581,6 @@ void mouseDragged() {
   if (from != null) {
       from.mouseDragged();
   }
-
-  if (tmpNode != null) {
-    tmpNode.mouseDragged();
-  }
 }
 
 Edge addConnection(Node from, Node to) {
@@ -587,10 +596,8 @@ Edge addConnection(Node from, Node to) {
 }
 class Queue extends Node implements IConnectable {
   int type = QUEUE;
-  ArrayList messages = new ArrayList();
   int msgs_number = 0;
   int unacked_number = 0;
-  // Edge anonBinding;
 
   Queue(String name, float x, float y) {
     super(name, colors[QUEUE], x, y);
@@ -616,45 +623,28 @@ class Queue extends Node implements IConnectable {
     return true;
   }
 
-  // void setAnonBinding(Edge e) {
-  //   anonBinding = e;
-  // }
-
   Edge getAnonBinding() {
     return anonBinding;
   }
 
   void connectWith(Node n, int endpoint) {
     super.connectWith(n, endpoint);
-    // maybeDeliverMessage();
   }
 
-  void trasnferArrived(Transfer transfer) {
-    enqueue(transfer);
-    // maybeDeliverMessage();
+  void transferMsg(Consumer c, int msg_id) {
+      stage.addTransfer(new Transfer(stage, this, c, msg_id, tMsgColor));
   }
 
+  /**
+   * An ack arrived form the consumer
+   **/
+  void transferArrived(Transfer transfer) {
+  }
+
+  /**
+   * The transfer reached the consumer
+   **/
   void transferDelivered(Transfer transfer) {
-    // incoming.add(transfer.getTo());
-    // maybeDeliverMessage();
-  }
-
-  void enqueue(Transfer transfer) {
-    messages.add(transfer);
-  }
-
-  Transfer dequeue() {
-    return (Transfer) messages.remove(0);
-  }
-
-  void maybeDeliverMessage() {
-    // if (messages.size() > 0) {
-    //   if (incoming.size() > 0) {
-    //     Node consumer = (Node) incoming.remove(0);
-    //     Transfer transfer = dequeue();
-    //     stage.addTransfer(new Transfer(stage, this, consumer, transfer.getData()));
-    //   }
-    // }
   }
 
   void changeName(String name) {
@@ -675,11 +665,11 @@ class Queue extends Node implements IConnectable {
   }
 
   void mouseClicked(boolean modifier) {
-      if (modifier) {
+      // if (modifier) {
           deliver_message();
-      } else {
-          // init_queue_form();
-      }
+      // } else {
+      //     // init_queue_form();
+      // }
   }
 }
 static class QueueFigure
@@ -709,3 +699,93 @@ static class QueueFigure
     }
 }
 
+class Stage {
+  ArrayList transfers = new ArrayList();
+
+  Stage() {
+  }
+
+  void addTransfer(Transfer transfer) {
+    transfers.add(transfer);
+  }
+
+  void draw() {
+    for (int i = transfers.size()-1; i >= 0; i--) {
+      Transfer transfer = (Transfer) transfers.get(i);
+      transfer.update();
+      transfer.draw();
+      transfer.afterDraw();
+
+      if (transfer.isFinished()) {
+          transfers.remove(i);
+      }
+    }
+  }
+}
+class Transfer {
+  Stage stage;
+  color fillColor;
+  float x, y;
+  int radii = 5;
+  float distX, distY;
+  float step = 0.02;
+  float pct = 0.0;
+  boolean finished = false;
+  int data;
+  Node from, to;
+
+  Transfer(Stage stage, Node from, Node to, int data, color fillColor) {
+    this.stage = stage;
+    this.from = from;
+    this.to = to;
+    this.data = data;
+    this.fillColor = fillColor;
+
+    x = from.x;
+    y = from.y;
+    this.updateDist();
+  }
+
+  Message getData() {
+    return data;
+  }
+
+  Node getFrom() {
+    return from;
+  }
+
+  Node getTo() {
+    return to;
+  }
+
+  boolean isFinished() {
+    return finished;
+  }
+
+  void updateDist() {
+    distX = to.x - from.x;
+    distY = to.y - from.y;
+  }
+
+  void update() {
+    updateDist();
+    if (pct < 1.0) {
+      this.x = from.x + (pct * distX);
+      this.y = from.y + (pct * distY);
+    }
+  }
+
+  void draw() {
+    pct += step;
+    fill(fillColor);
+    ellipse(x, y, radii*2, radii*2);
+  }
+
+  void afterDraw() {
+    if (pct >= 1.0) {
+      finished = true;
+      from.transferDelivered(this);
+      to.transferArrived(this);
+    }
+  }
+}

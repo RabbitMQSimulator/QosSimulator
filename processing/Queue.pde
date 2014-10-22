@@ -1,9 +1,7 @@
 class Queue extends Node implements IConnectable {
   int type = QUEUE;
-  ArrayList messages = new ArrayList();
   int msgs_number = 0;
   int unacked_number = 0;
-  // Edge anonBinding;
 
   Queue(String name, float x, float y) {
     super(name, colors[QUEUE], x, y);
@@ -29,45 +27,28 @@ class Queue extends Node implements IConnectable {
     return true;
   }
 
-  // void setAnonBinding(Edge e) {
-  //   anonBinding = e;
-  // }
-
   Edge getAnonBinding() {
     return anonBinding;
   }
 
   void connectWith(Node n, int endpoint) {
     super.connectWith(n, endpoint);
-    // maybeDeliverMessage();
   }
 
-  void trasnferArrived(Transfer transfer) {
-    enqueue(transfer);
-    // maybeDeliverMessage();
+  void transferMsg(Consumer c, int msg_id) {
+      stage.addTransfer(new Transfer(stage, this, c, msg_id, tMsgColor));
   }
 
+  /**
+   * An ack arrived form the consumer
+   **/
+  void transferArrived(Transfer transfer) {
+  }
+
+  /**
+   * The transfer reached the consumer
+   **/
   void transferDelivered(Transfer transfer) {
-    // incoming.add(transfer.getTo());
-    // maybeDeliverMessage();
-  }
-
-  void enqueue(Transfer transfer) {
-    messages.add(transfer);
-  }
-
-  Transfer dequeue() {
-    return (Transfer) messages.remove(0);
-  }
-
-  void maybeDeliverMessage() {
-    // if (messages.size() > 0) {
-    //   if (incoming.size() > 0) {
-    //     Node consumer = (Node) incoming.remove(0);
-    //     Transfer transfer = dequeue();
-    //     stage.addTransfer(new Transfer(stage, this, consumer, transfer.getData()));
-    //   }
-    // }
   }
 
   void changeName(String name) {
@@ -88,10 +69,10 @@ class Queue extends Node implements IConnectable {
   }
 
   void mouseClicked(boolean modifier) {
-      if (modifier) {
+      // if (modifier) {
           deliver_message();
-      } else {
-          // init_queue_form();
-      }
+      // } else {
+      //     // init_queue_form();
+      // }
   }
 }

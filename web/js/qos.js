@@ -119,13 +119,14 @@ Queue.prototype.maybe_deliver_message = function() {
                 this.move_msg_to_unacked(this.current_consumer.get_id(), msg_id);
                 this.decr_msgs(1);
                 this.update_view_counters();
-                this.current_consumer.handle_msg(msg_id);
+                // this.current_consumer.handle_msg(msg_id);
+                // msg flying visualization
+                this.get_view_node().transferMsg(this.current_consumer.get_view_node(), msg_id);
             }
         }
 
         if (qos != 0 && this.unacked_msgs[this.current_consumer.get_id()].length >= qos) {
             // stop sending messages to this consumer.
-            console.log('rotate consumer');
             this.consumers.push(this.current_consumer);
             this.current_consumer = null;
         }
@@ -154,6 +155,9 @@ Queue.prototype.add_consumer = function(consumer) {
         },
         basic_qos: function () {
             return consumer.get_qos();
+        },
+        get_view_node: function() {
+            return consumer.get_view_node();
         }
     };
     this.unacked_msgs[consumer.get_id()] = [];
@@ -232,12 +236,10 @@ function Consumer(name, uuid, delay, node) {
 }
 
 Consumer.prototype.pause = function() {
-    console.log('consumer pause');
     this.paused = true;
 }
 
 Consumer.prototype.play = function() {
-    console.log('consumer play');
     this.paused = false;
 }
 
@@ -291,17 +293,13 @@ Consumer.prototype.handle_msg = function(msg) {
     this.get_view_node().incrQueuedMsgs(1);
     this.msgs.push(msg);
 
-    console.log('handle_msg');
-
     if (!this.working) {
         this.process_next_msg();
     }
 }
 
 Consumer.prototype.process_next_msg = function() {
-    console.log('process_next_msg', this.credit);
     if (queue_paused) {
-        console.log('is paused', this.credit);
         if (this.credit < 1) {
             return;
         } else {
@@ -324,9 +322,13 @@ Consumer.prototype.process_next_msg = function() {
 Consumer.prototype.process_msg = function(msg) {
     this.get_view_node().rotateConsumer();
     this.get_view_node().decrQueuedMsgs(1);
+
+    // send ack visual to the queue
+    this.get_view_node().transferAck(this.queue.get_view_node(), msg);
+}
+
+Consumer.prototype.ack_msg = function(msg) {
     this.queue.ack(this.get_id(), msg, false);
-    // TODO see if next line is reached.
-    this.process_next_msg();
 }
 
 var STAGE_WIDTH = 600;

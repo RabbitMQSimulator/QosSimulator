@@ -1,5 +1,5 @@
 /* @pjs pauseOnBlur="true"; */
-
+Stage stage = new Stage();
 int nodeCount;
 Node[] nodes = new Node[100];
 
@@ -10,7 +10,6 @@ HashMap nodeTable = new HashMap();
 ArrayList edges = new ArrayList();
 
 // use to track interactions between objects
-Node tmpNode;
 Node from;
 Node to;
 
@@ -25,6 +24,8 @@ static final color nodeColor   = #F0C070;
 static final color selectColor = #FF3030;
 static final color fixedColor  = #FF8080;
 static final color edgeColor   = #000000;
+static final color tAckColor = #000000;
+static final color tMsgColor = #FFFFFF;
 
 static final int QUEUE = 0;
 static final int CONSUMER = 1;
@@ -110,8 +111,6 @@ Node addNodeByType(int type, String label, float x, float y) {
       if (nodeCount == nodes.length) {
         nodes = (Node[]) expand(nodes);
       }
-
-      console.log(label);
       nodeTable.put(label, n);
       nodes[nodeCount++] = n;
   }
@@ -173,9 +172,7 @@ void draw() {
     e.draw();
   }
 
-  if (tmpNode != null) {
-    tmpNode.draw();
-  }
+  stage.draw();
 }
 
 Node nodeBelowMouse() {
@@ -208,10 +205,6 @@ boolean altOrShiftKeyPressed() {
 void mouseDragged() {
   if (from != null) {
       from.mouseDragged();
-  }
-
-  if (tmpNode != null) {
-    tmpNode.mouseDragged();
   }
 }
 

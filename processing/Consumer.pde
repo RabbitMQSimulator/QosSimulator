@@ -42,8 +42,24 @@ class Consumer extends Node implements IConnectable {
     return outgoing.size() < 1;
   }
 
-  void trasnferArrived(Transfer transfer) {
-    rotateConsumer();
+  void transferAck(Queue q, int msg_id) {
+      stage.addTransfer(new Transfer(stage, this, q, msg_id, tAckColor));
+  }
+
+  /**
+   * A msg arrived from the queue
+   **/
+  void transferArrived(Transfer transfer) {
+      // console.log("consumer, msg arrived");
+      consumer_handle_msg(this.uuid, transfer.getData());
+  }
+
+  /**
+   * Our ack  arrived to the queue
+   **/
+  void transferDelivered(Transfer transfer) {
+      // console.log("consumer, ack delivered");
+      consumer_ack_msg(this.uuid, transfer.getData());
   }
 
   void rotateConsumer() {
